@@ -9,38 +9,100 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as EmailTemplatesRouteImport } from './routes/email-templates'
+import { Route as EmailBuilderRouteImport } from './routes/email-builder'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EmailTemplatesIndexRouteImport } from './routes/email-templates.index'
+import { Route as EmailBuilderIdRouteImport } from './routes/email-builder.$id'
 
+const EmailTemplatesRoute = EmailTemplatesRouteImport.update({
+  id: '/email-templates',
+  path: '/email-templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmailBuilderRoute = EmailBuilderRouteImport.update({
+  id: '/email-builder',
+  path: '/email-builder',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmailTemplatesIndexRoute = EmailTemplatesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EmailTemplatesRoute,
+} as any)
+const EmailBuilderIdRoute = EmailBuilderIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => EmailBuilderRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/email-builder': typeof EmailBuilderRouteWithChildren
+  '/email-templates': typeof EmailTemplatesRouteWithChildren
+  '/email-builder/$id': typeof EmailBuilderIdRoute
+  '/email-templates/': typeof EmailTemplatesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/email-builder': typeof EmailBuilderRouteWithChildren
+  '/email-builder/$id': typeof EmailBuilderIdRoute
+  '/email-templates': typeof EmailTemplatesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/email-builder': typeof EmailBuilderRouteWithChildren
+  '/email-templates': typeof EmailTemplatesRouteWithChildren
+  '/email-builder/$id': typeof EmailBuilderIdRoute
+  '/email-templates/': typeof EmailTemplatesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/email-builder'
+    | '/email-templates'
+    | '/email-builder/$id'
+    | '/email-templates/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/email-builder' | '/email-builder/$id' | '/email-templates'
+  id:
+    | '__root__'
+    | '/'
+    | '/email-builder'
+    | '/email-templates'
+    | '/email-builder/$id'
+    | '/email-templates/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  EmailBuilderRoute: typeof EmailBuilderRouteWithChildren
+  EmailTemplatesRoute: typeof EmailTemplatesRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/email-templates': {
+      id: '/email-templates'
+      path: '/email-templates'
+      fullPath: '/email-templates'
+      preLoaderRoute: typeof EmailTemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/email-builder': {
+      id: '/email-builder'
+      path: '/email-builder'
+      fullPath: '/email-builder'
+      preLoaderRoute: typeof EmailBuilderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +110,52 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/email-templates/': {
+      id: '/email-templates/'
+      path: '/'
+      fullPath: '/email-templates/'
+      preLoaderRoute: typeof EmailTemplatesIndexRouteImport
+      parentRoute: typeof EmailTemplatesRoute
+    }
+    '/email-builder/$id': {
+      id: '/email-builder/$id'
+      path: '/$id'
+      fullPath: '/email-builder/$id'
+      preLoaderRoute: typeof EmailBuilderIdRouteImport
+      parentRoute: typeof EmailBuilderRoute
+    }
   }
 }
 
+interface EmailBuilderRouteChildren {
+  EmailBuilderIdRoute: typeof EmailBuilderIdRoute
+}
+
+const EmailBuilderRouteChildren: EmailBuilderRouteChildren = {
+  EmailBuilderIdRoute: EmailBuilderIdRoute,
+}
+
+const EmailBuilderRouteWithChildren = EmailBuilderRoute._addFileChildren(
+  EmailBuilderRouteChildren,
+)
+
+interface EmailTemplatesRouteChildren {
+  EmailTemplatesIndexRoute: typeof EmailTemplatesIndexRoute
+}
+
+const EmailTemplatesRouteChildren: EmailTemplatesRouteChildren = {
+  EmailTemplatesIndexRoute: EmailTemplatesIndexRoute,
+}
+
+const EmailTemplatesRouteWithChildren = EmailTemplatesRoute._addFileChildren(
+  EmailTemplatesRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  EmailBuilderRoute: EmailBuilderRouteWithChildren,
+  EmailTemplatesRoute: EmailTemplatesRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

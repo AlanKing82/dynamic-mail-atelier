@@ -13,6 +13,7 @@ import { Route as EmailTemplatesRouteImport } from './routes/email-templates'
 import { Route as EmailBuilderRouteImport } from './routes/email-builder'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as EmailTemplatesIndexRouteImport } from './routes/email-templates.index'
+import { Route as EmailTemplatesV1RouteImport } from './routes/email-templates.v1'
 import { Route as EmailBuilderIdRouteImport } from './routes/email-builder.$id'
 
 const EmailTemplatesRoute = EmailTemplatesRouteImport.update({
@@ -35,6 +36,11 @@ const EmailTemplatesIndexRoute = EmailTemplatesIndexRouteImport.update({
   path: '/',
   getParentRoute: () => EmailTemplatesRoute,
 } as any)
+const EmailTemplatesV1Route = EmailTemplatesV1RouteImport.update({
+  id: '/v1',
+  path: '/v1',
+  getParentRoute: () => EmailTemplatesRoute,
+} as any)
 const EmailBuilderIdRoute = EmailBuilderIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -46,12 +52,14 @@ export interface FileRoutesByFullPath {
   '/email-builder': typeof EmailBuilderRouteWithChildren
   '/email-templates': typeof EmailTemplatesRouteWithChildren
   '/email-builder/$id': typeof EmailBuilderIdRoute
+  '/email-templates/v1': typeof EmailTemplatesV1Route
   '/email-templates/': typeof EmailTemplatesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/email-builder': typeof EmailBuilderRouteWithChildren
   '/email-builder/$id': typeof EmailBuilderIdRoute
+  '/email-templates/v1': typeof EmailTemplatesV1Route
   '/email-templates': typeof EmailTemplatesIndexRoute
 }
 export interface FileRoutesById {
@@ -60,6 +68,7 @@ export interface FileRoutesById {
   '/email-builder': typeof EmailBuilderRouteWithChildren
   '/email-templates': typeof EmailTemplatesRouteWithChildren
   '/email-builder/$id': typeof EmailBuilderIdRoute
+  '/email-templates/v1': typeof EmailTemplatesV1Route
   '/email-templates/': typeof EmailTemplatesIndexRoute
 }
 export interface FileRouteTypes {
@@ -69,15 +78,22 @@ export interface FileRouteTypes {
     | '/email-builder'
     | '/email-templates'
     | '/email-builder/$id'
+    | '/email-templates/v1'
     | '/email-templates/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/email-builder' | '/email-builder/$id' | '/email-templates'
+  to:
+    | '/'
+    | '/email-builder'
+    | '/email-builder/$id'
+    | '/email-templates/v1'
+    | '/email-templates'
   id:
     | '__root__'
     | '/'
     | '/email-builder'
     | '/email-templates'
     | '/email-builder/$id'
+    | '/email-templates/v1'
     | '/email-templates/'
   fileRoutesById: FileRoutesById
 }
@@ -117,6 +133,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmailTemplatesIndexRouteImport
       parentRoute: typeof EmailTemplatesRoute
     }
+    '/email-templates/v1': {
+      id: '/email-templates/v1'
+      path: '/v1'
+      fullPath: '/email-templates/v1'
+      preLoaderRoute: typeof EmailTemplatesV1RouteImport
+      parentRoute: typeof EmailTemplatesRoute
+    }
     '/email-builder/$id': {
       id: '/email-builder/$id'
       path: '/$id'
@@ -140,10 +163,12 @@ const EmailBuilderRouteWithChildren = EmailBuilderRoute._addFileChildren(
 )
 
 interface EmailTemplatesRouteChildren {
+  EmailTemplatesV1Route: typeof EmailTemplatesV1Route
   EmailTemplatesIndexRoute: typeof EmailTemplatesIndexRoute
 }
 
 const EmailTemplatesRouteChildren: EmailTemplatesRouteChildren = {
+  EmailTemplatesV1Route: EmailTemplatesV1Route,
   EmailTemplatesIndexRoute: EmailTemplatesIndexRoute,
 }
 

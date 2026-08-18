@@ -63,5 +63,5 @@ export const templatesQueryOptions = () =>
   queryOptions({
     queryKey: ["email-templates"],
     queryFn: listTemplates,
-    staleTime: 0,
+    staleTime: 5 * 60 * 1000,
   });

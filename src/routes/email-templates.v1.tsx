@@ -27,6 +27,14 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/email-templates/v1")({
   validateSearch: searchSchema,
+  head: () => ({
+    meta: [
+      { title: "Templates (v1) — Exante Admin" },
+      { name: "description", content: "Version 1 email template browser with filters and preview" },
+      { property: "og:title", content: "Templates (v1) — Exante Admin" },
+      { property: "og:description", content: "Version 1 email template browser with filters and preview" },
+    ],
+  }),
   loader: ({ context }) => context.queryClient.ensureQueryData(templatesQueryOptions()),
   component: TemplatesBrowser,
 });

@@ -15,6 +15,7 @@ import {
   BarChart3,
   MapPin,
   LogOut,
+  History,
 } from "lucide-react";
 import {
   Sidebar,
@@ -31,6 +32,7 @@ import {
 const primaryItems = [
   { title: "Home", url: "/", icon: Home, enabled: true },
   { title: "Email Templates", url: "/email-templates", icon: Mail, enabled: true },
+  { title: "Templates (v1)", url: "/email-templates/v1", icon: History, enabled: true },
   { title: "Email Builder", url: "/email-builder", icon: Wand2, enabled: true },
 ];
 

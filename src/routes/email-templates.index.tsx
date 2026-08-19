@@ -26,9 +26,11 @@ import { TemplatePanel } from "@/components/coverage/TemplatePanel";
 import {
   PRODUCT_TEMPLATE_CATALOG,
   findProduct,
+  productStages,
   productStats,
   type TemplateSlot,
 } from "@/lib/email-templates/catalog";
+
 
 const searchSchema = z.object({
   trigger: z.string().optional(),

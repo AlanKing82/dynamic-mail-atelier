@@ -482,6 +482,79 @@ export const PRODUCT_TEMPLATE_CATALOG: ProductTemplateCatalog[] = [
   },
 ];
 
+/* ---------- Canonical taxonomy stages ---------- */
+
+export interface JourneyStage {
+  id: "account" | "authentication" | "policy" | "coverage" | "payment";
+  index: string;
+  label: string;
+  subtitle: string;
+  summary: string;
+}
+
+export const JOURNEY_STAGES: JourneyStage[] = [
+  {
+    id: "account",
+    index: "01",
+    label: "Account",
+    subtitle: "Customer Creation",
+    summary: "Account Creation",
+  },
+  {
+    id: "authentication",
+    index: "02",
+    label: "Authentication",
+    subtitle: "Security & Access",
+    summary: "Email / Password Reset",
+  },
+  {
+    id: "policy",
+    index: "03",
+    label: "Policy",
+    subtitle: "Quote & Purchase",
+    summary: "Policy Ready",
+  },
+  {
+    id: "coverage",
+    index: "04",
+    label: "Coverage",
+    subtitle: "Parametric Bounds",
+    summary: "Started / Ended / Added",
+  },
+  {
+    id: "payment",
+    index: "05",
+    label: "Payment",
+    subtitle: "Billing & Invoicing",
+    summary: "Due / Failed / Not Due",
+  },
+];
+
+export function stageForEvent(event: string): JourneyStage["id"] {
+  const e = event.toLowerCase();
+  if (e.startsWith("account")) return "account";
+  if (e.startsWith("email-reset") || e.startsWith("password-reset"))
+    return "authentication";
+  if (e.startsWith("policy")) return "policy";
+  if (e.startsWith("payment")) return "payment";
+  return "coverage";
+}
+
+export interface ResolvedStage extends JourneyStage {
+  slots: TemplateSlot[];
+}
+
+/** Regroups a product's slots into the canonical taxonomy stages. */
+export function productStages(
+  product: ProductTemplateCatalog,
+): ResolvedStage[] {
+  const all = product.categories.flatMap((c) => c.slots);
+  return JOURNEY_STAGES.map((stage) => ({
+    ...stage,
+    slots: all.filter((s) => stageForEvent(s.event) === stage.id),
+  }));
+}
+
 export function productStats(product: ProductTemplateCatalog) {
   const slots = product.categories.flatMap((c) => c.slots);
   const ready = slots.filter((s) => s.status === "ready").length;
@@ -499,3 +572,4 @@ export function findProduct(trigger: string) {
     PRODUCT_TEMPLATE_CATALOG[0]
   );
 }
+

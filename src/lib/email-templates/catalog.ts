@@ -154,8 +154,39 @@ export const PRODUCT_TEMPLATE_CATALOG: ProductTemplateCatalog[] = [
         ],
       },
       {
+        label: "Coverage",
+        kind: "core",
+        slots: [
+          {
+            event: "coverage/started",
+            templateName: "etit-coverage-started",
+            name: "Coverage Started",
+            description: "Sent when the parametric cover period begins.",
+            fileName: "ETIT-Coverage-Started.html",
+            status: "missing",
+          },
+          {
+            event: "coverage/ended",
+            templateName: "etit-coverage-ended",
+            name: "Coverage Ended",
+            description: "Sent when the parametric cover period ends.",
+            fileName: "ETIT-Coverage-Ended.html",
+            status: "missing",
+          },
+          {
+            event: "coverage/added",
+            templateName: "etit-coverage-added",
+            name: "Coverage Added",
+            description: "Confirms additional cover added to the policy.",
+            fileName: "ETIT-Coverage-Added.html",
+            status: "missing",
+          },
+        ],
+      },
+      {
         label: "Payment",
         kind: "core",
+
         slots: [
           {
             event: "payment/due",

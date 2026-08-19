@@ -152,14 +152,13 @@ function CoverageDashboard() {
 
   const stages = useMemo(
     () =>
-      product.categories
-        .map((c) => ({
-          ...c,
-          slots: c.slots.filter((s) => status === "all" || s.status === status),
-        }))
-        .filter((c) => c.slots.length > 0),
+      productStages(product).map((s) => ({
+        ...s,
+        slots: s.slots.filter((x) => status === "all" || x.status === status),
+      })),
     [product, status],
   );
+
 
   return (
     <div className="min-h-[calc(100vh-3.5rem)] bg-muted/20">

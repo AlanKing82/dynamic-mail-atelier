@@ -269,54 +269,56 @@ function CoverageDashboard() {
           </Tabs>
         </div>
 
-        <div className="-mx-6 overflow-x-auto px-6 pb-6">
-          <div className="flex min-w-max flex-col gap-6 lg:flex-row lg:items-start">
+        <div className="pb-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {stages.map((stage, i) => (
-              <div key={stage.id} className="flex items-start gap-6">
-                <section className="w-[300px] shrink-0 rounded-2xl border bg-background/60 p-4">
-                  <div className="mb-1 flex items-center gap-2">
-                    <span className="grid h-5 min-w-5 shrink-0 place-items-center rounded-md bg-primary/10 px-1 font-mono text-[10px] font-semibold text-primary">
-                      {stage.index}
-                    </span>
-                    <span className="truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-                      {stage.label}
-                    </span>
-                  </div>
-                  <div className="mb-3 flex items-end justify-between gap-2 border-b pb-3">
-                    <h3 className="truncate text-base font-semibold tracking-tight">
-                      {stage.subtitle}
-                    </h3>
-                    <span className="shrink-0 text-xs text-muted-foreground">
-                      {stage.slots.length}{" "}
-                      {stage.slots.length === 1 ? "event" : "events"}
-                    </span>
-                  </div>
-                  <div className="mb-3 text-[11px] text-muted-foreground">
-                    {stage.summary}
-                  </div>
-                  <div className="flex flex-col gap-3">
-                    {stage.slots.map((slot) => (
-                      <NodeCard
-                        key={slot.templateName}
-                        slot={slot}
-                        onSelect={() => setSelected(slot)}
-                      />
-                    ))}
-                    {stage.slots.length === 0 && (
-                      <div className="rounded-xl border border-dashed p-6 text-center text-xs text-muted-foreground">
-                        No events
-                      </div>
-                    )}
-                  </div>
-                </section>
+              <section
+                key={stage.id}
+                className="relative min-w-0 rounded-2xl border bg-background/60 p-4"
+              >
                 {i < stages.length - 1 && (
-                  <div className="hidden shrink-0 items-center self-start pt-8 lg:flex">
-                    <span className="h-px w-4 bg-border" />
-                    <ArrowRight className="h-4 w-4 text-muted-foreground/60" />
+                  <div className="pointer-events-none absolute -right-4 top-7 hidden w-4 items-center xl:flex">
+                    <span className="h-px w-2 bg-border" />
+                    <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/60" />
                   </div>
                 )}
-              </div>
+                <div className="mb-1 flex items-center gap-2">
+                  <span className="grid h-5 min-w-5 shrink-0 place-items-center rounded-md bg-primary/10 px-1 font-mono text-[10px] font-semibold text-primary">
+                    {stage.index}
+                  </span>
+                  <span className="truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                    {stage.label}
+                  </span>
+                </div>
+                <div className="mb-3 flex items-end justify-between gap-2 border-b pb-3">
+                  <h3 className="truncate text-base font-semibold tracking-tight">
+                    {stage.subtitle}
+                  </h3>
+                  <span className="shrink-0 text-xs text-muted-foreground">
+                    {stage.slots.length}{" "}
+                    {stage.slots.length === 1 ? "event" : "events"}
+                  </span>
+                </div>
+                <div className="mb-3 text-[11px] text-muted-foreground">
+                  {stage.summary}
+                </div>
+                <div className="flex flex-col gap-3">
+                  {stage.slots.map((slot) => (
+                    <NodeCard
+                      key={slot.templateName}
+                      slot={slot}
+                      onSelect={() => setSelected(slot)}
+                    />
+                  ))}
+                  {stage.slots.length === 0 && (
+                    <div className="rounded-xl border border-dashed p-6 text-center text-xs text-muted-foreground">
+                      No events
+                    </div>
+                  )}
+                </div>
+              </section>
             ))}
+
 
           </div>
         </div>

@@ -30,6 +30,11 @@ import { toast } from "sonner";
 import { renderBuilderDocToHtml, emptyDoc, newBlock } from "@/lib/email-templates/render";
 import { saveTemplate } from "@/lib/email-templates/service";
 import { TRIGGER_VARIABLES, SEED_TEMPLATES } from "@/lib/email-templates/seed";
+import {
+  productsForUI,
+  schemaLocationForEvent,
+  templatePath,
+} from "@/lib/email-templates/schema";
 import type {
   Block,
   BuilderDoc,
@@ -37,8 +42,19 @@ import type {
   BuilderBlockType,
 } from "@/lib/email-templates/types";
 
+interface BuilderPreset {
+  product?: string;
+  trigger?: string;
+  stage?: string;
+  event?: string;
+  fileName?: string;
+  format?: string;
+  name?: string;
+}
+
 interface Props {
   initial?: EmailTemplate;
+  preset?: BuilderPreset;
 }
 
 const COMPONENTS: { type: BuilderBlockType; label: string; icon: React.ComponentType<{ className?: string }> }[] = [

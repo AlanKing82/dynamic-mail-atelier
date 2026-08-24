@@ -66,20 +66,47 @@ const COMPONENTS: { type: BuilderBlockType; label: string; icon: React.Component
   { type: "divider", label: "Divider", icon: Minus },
 ];
 
-const PRODUCTS = Array.from(new Set(SEED_TEMPLATES.map((t) => t.product)));
-const TRIGGERS = Object.keys(TRIGGER_VARIABLES);
+const PRODUCTS = Array.from(
+  new Set([
+    ...SEED_TEMPLATES.map((t) => t.product),
+    ...productsForUI().map((p) => p.displayName),
+  ]),
+);
+const TRIGGERS = Array.from(
+  new Set([
+    ...Object.keys(TRIGGER_VARIABLES),
+    ...productsForUI().map((p) => p.trigger),
+  ]),
+);
 
-export function EmailBuilder({ initial }: Props) {
+export function EmailBuilder({ initial, preset }: Props) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const readOnly = !!initial && !initial.json;
 
   const [id] = useState(() => initial?.id ?? crypto.randomUUID());
-  const [name, setName] = useState(initial?.name ?? "Untitled template");
-  const [product, setProduct] = useState(initial?.product ?? PRODUCTS[0] ?? "");
-  const [trigger, setTrigger] = useState(initial?.trigger ?? TRIGGERS[0] ?? "");
-  const [eventName, setEventName] = useState(initial?.event ?? "trip/start");
+  const [name, setName] = useState(
+    initial?.name ?? preset?.name ?? "Untitled template",
+  );
+  const [product, setProduct] = useState(
+    initial?.product ?? preset?.product ?? PRODUCTS[0] ?? "",
+  );
+  const [trigger, setTrigger] = useState(
+    initial?.trigger ?? preset?.trigger ?? TRIGGERS[0] ?? "",
+  );
+  const [eventName, setEventName] = useState(
+    initial?.event ??
+      (preset?.stage && preset?.event
+        ? `${preset.stage}/${preset.event}`
+        : (preset?.event ?? "trip/start")),
+  );
+  const [fileName, setFileName] = useState(
+    initial?.fileName ?? preset?.fileName ?? "",
+  );
+  const [format] = useState<"html" | "json">(
+    initial?.format ?? (preset?.format === "json" ? "json" : "html"),
+  );
   const [doc, setDoc] = useState<BuilderDoc>(() => initial?.json ?? emptyDoc());
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showSource, setShowSource] = useState(false);

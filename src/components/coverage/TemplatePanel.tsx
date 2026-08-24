@@ -10,6 +10,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import type { ProductTemplateCatalog, TemplateSlot } from "@/lib/email-templates/catalog";
+import { schemaLocationForEvent } from "@/lib/email-templates/schema";
 
 interface Props {
   slot: TemplateSlot | null;

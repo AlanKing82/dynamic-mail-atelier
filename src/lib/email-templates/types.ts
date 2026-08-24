@@ -76,6 +76,9 @@ export interface EmailTemplate {
   event: string;
   html: string;
   json?: BuilderDoc | null;
+  /** File basename stored under templates/<PRODUCT>/<STAGE>/<EVENT>/<FORMAT>/ */
+  fileName?: string;
+  format?: "html" | "json";
   source: "seed" | "user";
   updatedAt: string;
 }

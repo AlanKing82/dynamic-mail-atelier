@@ -119,6 +119,7 @@ export function EmailBuilder({ initial, preset }: Props) {
 
   const html = useMemo(() => renderBuilderDocToHtml(doc), [doc]);
   const variables = TRIGGER_VARIABLES[trigger] ?? [];
+  const pathLocation = schemaLocationForEvent(eventName);
 
   useEffect(() => {
     if (selected) setTab("properties");
@@ -156,6 +157,8 @@ export function EmailBuilder({ initial, preset }: Props) {
       event: eventName,
       html,
       json: doc,
+      fileName: fileName || undefined,
+      format,
       source: "user",
       updatedAt: new Date().toISOString(),
     };
@@ -226,6 +229,21 @@ export function EmailBuilder({ initial, preset }: Props) {
           )}
         </div>
       </div>
+
+      {fileName && (
+        <div className="border-b bg-muted/30 px-4 py-1.5 font-mono text-[11px] text-muted-foreground">
+          Saves to{" "}
+          <span className="text-foreground">
+            {templatePath(
+              trigger,
+              pathLocation.stage,
+              pathLocation.event,
+              format,
+              fileName,
+            )}
+          </span>
+        </div>
+      )}
 
       {readOnly && (
         <Alert className="rounded-none border-x-0 border-t-0">

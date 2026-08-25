@@ -1,4 +1,4 @@
-export type SlotStatus = "ready" | "missing";
+export type SlotStatus = "ready" | "pending" | "missing";
 
 export interface TemplateSlot {
   /** Event input + folder under the trigger */
@@ -98,7 +98,7 @@ export const PRODUCT_TEMPLATE_CATALOG: ProductTemplateCatalog[] = [
             name: "ETIT Email Reset Confirmation",
             description: "Sent once the email address change has completed.",
             fileName: "ETIT-Email-Reset-Confirmation.html",
-            status: "missing",
+            status: "pending",
           },
         ],
       },
@@ -171,7 +171,7 @@ export const PRODUCT_TEMPLATE_CATALOG: ProductTemplateCatalog[] = [
             name: "Coverage Ended",
             description: "Sent when the parametric cover period ends.",
             fileName: "ETIT-Coverage-Ended.html",
-            status: "missing",
+            status: "pending",
           },
           {
             event: "coverage/added",
@@ -589,10 +589,12 @@ export function productStages(
 export function productStats(product: ProductTemplateCatalog) {
   const slots = product.categories.flatMap((c) => c.slots);
   const ready = slots.filter((s) => s.status === "ready").length;
+  const pending = slots.filter((s) => s.status === "pending").length;
   return {
     total: slots.length,
     ready,
-    missing: slots.length - ready,
+    pending,
+    missing: slots.length - ready - pending,
     coverage: slots.length ? Math.round((ready / slots.length) * 100) : 0,
   };
 }

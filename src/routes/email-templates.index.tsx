@@ -69,30 +69,59 @@ function StatCard({
   value,
   tone = "default",
   icon: Icon,
+  active,
+  onClick,
 }: {
   label: string;
   value: string;
-  tone?: "default" | "ready" | "missing";
+  tone?: "default" | "ready" | "pending" | "missing";
   icon: React.ElementType;
+  active: boolean;
+  onClick: () => void;
 }) {
-  const toneClass =
-    tone === "ready"
-      ? "text-emerald-600 dark:text-emerald-400"
-      : tone === "missing"
-        ? "text-amber-600 dark:text-amber-400"
-        : "text-foreground";
+  const tones = {
+    default: {
+      wrap: "bg-card hover:bg-muted/60",
+      on: "border-primary bg-primary/10 ring-1 ring-primary/40",
+      text: "text-foreground",
+    },
+    ready: {
+      wrap: "bg-emerald-500/5 hover:bg-emerald-500/10",
+      on: "border-emerald-500 bg-emerald-500/15 ring-1 ring-emerald-500/40",
+      text: "text-emerald-600 dark:text-emerald-400",
+    },
+    pending: {
+      wrap: "bg-sky-500/5 hover:bg-sky-500/10",
+      on: "border-sky-500 bg-sky-500/15 ring-1 ring-sky-500/40",
+      text: "text-sky-600 dark:text-sky-400",
+    },
+    missing: {
+      wrap: "bg-amber-500/5 hover:bg-amber-500/10",
+      on: "border-amber-500 bg-amber-500/15 ring-1 ring-amber-500/40",
+      text: "text-amber-600 dark:text-amber-400",
+    },
+  }[tone];
+
   return (
-    <div className="rounded-xl border bg-card px-4 py-3">
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`h-[74px] rounded-xl border px-4 py-3 text-left transition-all hover:-translate-y-0.5 ${
+        active ? tones.on : tones.wrap
+      }`}
+    >
       <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-        <Icon className={`h-3.5 w-3.5 ${toneClass}`} />
+        <Icon className={`h-3.5 w-3.5 ${tones.text}`} />
         <span className="truncate">{label}</span>
       </div>
-      <div className={`mt-1 text-2xl font-semibold tabular-nums ${toneClass}`}>
+      <div className={`mt-1 text-2xl font-semibold tabular-nums ${tones.text}`}>
         {value}
       </div>
-    </div>
+    </button>
   );
 }
+
 
 function NodeCard({
   slot,

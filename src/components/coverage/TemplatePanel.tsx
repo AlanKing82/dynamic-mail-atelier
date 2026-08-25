@@ -31,6 +31,7 @@ function Meta({ label, value, mono }: { label: string; value: string; mono?: boo
 
 export function TemplatePanel({ slot, product, onOpenChange }: Props) {
   const ready = slot?.status === "ready";
+  const loc = slot ? schemaLocationForEvent(slot.event) : null;
   return (
     <Sheet open={!!slot} onOpenChange={onOpenChange}>
       <SheetContent
@@ -97,7 +98,18 @@ export function TemplatePanel({ slot, product, onOpenChange }: Props) {
                 Close
               </Button>
               <Button asChild>
-                <Link to="/email-builder">
+                <Link
+                  to="/email-builder"
+                  search={{
+                    product: product.product,
+                    trigger: product.trigger,
+                    stage: loc?.stage,
+                    event: loc?.event,
+                    fileName: slot.fileName,
+                    format: "html",
+                    name: slot.name,
+                  }}
+                >
                   {ready ? (
                     <>
                       <Pencil className="mr-1 h-4 w-4" /> Edit template

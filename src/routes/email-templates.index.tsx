@@ -8,6 +8,7 @@ import {
   FilePlus2,
   History,
   LayoutTemplate,
+  Plus,
   Sparkles,
 } from "lucide-react";
 import {
@@ -23,6 +24,11 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TemplateThumb } from "@/components/coverage/TemplateThumb";
 import { TemplatePanel } from "@/components/coverage/TemplatePanel";
+import {
+  NewTemplateDialog,
+  type NewTemplatePreset,
+} from "@/components/coverage/NewTemplateDialog";
+import type { StageId } from "@/lib/email-templates/schema";
 import {
   PRODUCT_TEMPLATE_CATALOG,
   findProduct,
@@ -148,8 +154,28 @@ function CoverageDashboard() {
   const { trigger, status = "all" } = Route.useSearch();
   const navigate = useNavigate({ from: "/email-templates" });
   const [selected, setSelected] = useState<TemplateSlot | null>(null);
+  const [newOpen, setNewOpen] = useState(false);
+  const [newPreset, setNewPreset] = useState<NewTemplatePreset | undefined>(
+    undefined,
+  );
 
   const product = useMemo(() => findProduct(trigger ?? ""), [trigger]);
+
+  const openNewTemplate = (stageId?: string) => {
+    if (stageId === "policy") {
+      // "policy-ready" lives under the account stage in the canonical schema
+      setNewPreset({
+        product: product.trigger,
+        stage: "account",
+        event: "policy-ready",
+      });
+    } else if (stageId) {
+      setNewPreset({ product: product.trigger, stage: stageId as StageId });
+    } else {
+      setNewPreset({ product: product.trigger });
+    }
+    setNewOpen(true);
+  };
   const stats = useMemo(() => productStats(product), [product]);
 
   const stages = useMemo(
@@ -202,11 +228,16 @@ function CoverageDashboard() {
                   })}
                 </SelectContent>
               </Select>
-              <Button asChild variant="ghost" size="sm" className="self-end">
-                <Link to="/email-templates/v1">
-                  <History className="mr-1 h-4 w-4" /> Version 1 browser
-                </Link>
-              </Button>
+              <div className="flex items-center gap-2 self-end">
+                <Button asChild variant="ghost" size="sm">
+                  <Link to="/email-templates/v1">
+                    <History className="mr-1 h-4 w-4" /> Version 1 browser
+                  </Link>
+                </Button>
+                <Button size="sm" onClick={() => openNewTemplate()}>
+                  <Plus className="mr-1 h-4 w-4" /> New template
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -315,6 +346,12 @@ function CoverageDashboard() {
                       No events
                     </div>
                   )}
+                  <button
+                    onClick={() => openNewTemplate(stage.id)}
+                    className="flex items-center justify-center gap-1.5 rounded-xl border border-dashed p-2.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/60 hover:bg-primary/[0.04] hover:text-primary"
+                  >
+                    <Plus className="h-3.5 w-3.5" /> New template
+                  </button>
                 </div>
               </section>
             ))}
@@ -328,6 +365,11 @@ function CoverageDashboard() {
         slot={selected}
         product={product}
         onOpenChange={(open) => !open && setSelected(null)}
+      />
+      <NewTemplateDialog
+        open={newOpen}
+        onOpenChange={setNewOpen}
+        preset={newPreset}
       />
     </div>
   );

@@ -98,7 +98,7 @@ export const PRODUCT_TEMPLATE_CATALOG: ProductTemplateCatalog[] = [
             name: "ETIT Email Reset Confirmation",
             description: "Sent once the email address change has completed.",
             fileName: "ETIT-Email-Reset-Confirmation.html",
-            status: "missing",
+            status: "pending",
           },
         ],
       },
@@ -171,7 +171,7 @@ export const PRODUCT_TEMPLATE_CATALOG: ProductTemplateCatalog[] = [
             name: "Coverage Ended",
             description: "Sent when the parametric cover period ends.",
             fileName: "ETIT-Coverage-Ended.html",
-            status: "missing",
+            status: "pending",
           },
           {
             event: "coverage/added",

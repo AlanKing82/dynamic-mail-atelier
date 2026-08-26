@@ -1,12 +1,12 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import {
   AlertTriangle,
   ArrowRight,
   CheckCircle2,
+  Clock,
   FilePlus2,
-  History,
   LayoutTemplate,
   Plus,
   Sparkles,
@@ -19,9 +19,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TemplateThumb } from "@/components/coverage/TemplateThumb";
 import { TemplatePanel } from "@/components/coverage/TemplatePanel";
 import {
@@ -40,7 +37,7 @@ import {
 
 const searchSchema = z.object({
   trigger: z.string().optional(),
-  status: z.enum(["all", "ready", "missing"]).optional(),
+  status: z.enum(["all", "ready", "pending", "missing"]).optional(),
 });
 
 export const Route = createFileRoute("/email-templates/")({
@@ -131,22 +128,39 @@ function NodeCard({
   onSelect: () => void;
 }) {
   const ready = slot.status === "ready";
+  const pending = slot.status === "pending";
   return (
     <button
       onClick={onSelect}
       className={`group w-[248px] shrink-0 rounded-xl border bg-card p-3 text-left transition-all hover:-translate-y-0.5 hover:shadow-lg ${
         ready
           ? "hover:border-primary/50"
-          : "border-dashed border-amber-500/50 bg-amber-500/[0.04] hover:border-amber-500"
+          : pending
+            ? "border-sky-500/50 bg-sky-500/[0.05] hover:border-sky-500"
+            : "border-dashed border-amber-500/50 bg-amber-500/[0.04] hover:border-amber-500"
       }`}
     >
       {ready && slot.html ? (
         <TemplateThumb html={slot.html} title={slot.name} />
       ) : (
-        <div className="flex h-24 w-full flex-col items-center justify-center gap-1 rounded-md border border-dashed border-amber-500/40 bg-background/60">
-          <FilePlus2 className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-          <span className="text-[11px] font-medium text-amber-700 dark:text-amber-400">
-            Create template
+        <div
+          className={`flex h-24 w-full flex-col items-center justify-center gap-1 rounded-md border border-dashed bg-background/60 ${
+            pending ? "border-sky-500/40" : "border-amber-500/40"
+          }`}
+        >
+          {pending ? (
+            <Clock className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+          ) : (
+            <FilePlus2 className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+          )}
+          <span
+            className={`text-[11px] font-medium ${
+              pending
+                ? "text-sky-700 dark:text-sky-400"
+                : "text-amber-700 dark:text-amber-400"
+            }`}
+          >
+            {pending ? "In review" : "Create template"}
           </span>
         </div>
       )}
@@ -161,15 +175,19 @@ function NodeCard({
           className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${
             ready
               ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-              : "bg-amber-500/10 text-amber-700 dark:text-amber-400"
+              : pending
+                ? "bg-sky-500/10 text-sky-700 dark:text-sky-400"
+                : "bg-amber-500/10 text-amber-700 dark:text-amber-400"
           }`}
         >
           {ready ? (
             <CheckCircle2 className="h-3 w-3" />
+          ) : pending ? (
+            <Clock className="h-3 w-3" />
           ) : (
             <AlertTriangle className="h-3 w-3" />
           )}
-          {ready ? "Template ready" : "Template missing"}
+          {ready ? "Template ready" : pending ? "In review" : "Template missing"}
         </span>
         <span className="truncate font-mono text-[10px] text-muted-foreground">
           {slot.event}

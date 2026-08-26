@@ -132,7 +132,7 @@ function NodeCard({
   return (
     <button
       onClick={onSelect}
-      className={`group w-[248px] shrink-0 rounded-xl border bg-card p-3 text-left transition-all hover:-translate-y-0.5 hover:shadow-lg ${
+      className={`group w-full rounded-xl border bg-card p-3 text-left transition-all hover:-translate-y-0.5 hover:shadow-lg ${
         ready
           ? "hover:border-primary/50"
           : pending
@@ -264,14 +264,11 @@ function CoverageDashboard() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {PRODUCT_TEMPLATE_CATALOG.map((p) => {
-                      const s = productStats(p);
-                      return (
-                        <SelectItem key={p.trigger} value={p.trigger}>
-                          {p.product} · {s.ready}/{s.total}
-                        </SelectItem>
-                      );
-                    })}
+                    {PRODUCT_TEMPLATE_CATALOG.map((p) => (
+                      <SelectItem key={p.trigger} value={p.trigger}>
+                        {p.product}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

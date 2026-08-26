@@ -1,12 +1,12 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { z } from "zod";
 import {
   AlertTriangle,
   ArrowRight,
   CheckCircle2,
+  Clock,
   FilePlus2,
-  History,
   LayoutTemplate,
   Plus,
   Sparkles,
@@ -19,9 +19,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TemplateThumb } from "@/components/coverage/TemplateThumb";
 import { TemplatePanel } from "@/components/coverage/TemplatePanel";
 import {
@@ -40,7 +37,7 @@ import {
 
 const searchSchema = z.object({
   trigger: z.string().optional(),
-  status: z.enum(["all", "ready", "missing"]).optional(),
+  status: z.enum(["all", "ready", "pending", "missing"]).optional(),
 });
 
 export const Route = createFileRoute("/email-templates/")({
@@ -131,22 +128,39 @@ function NodeCard({
   onSelect: () => void;
 }) {
   const ready = slot.status === "ready";
+  const pending = slot.status === "pending";
   return (
     <button
       onClick={onSelect}
-      className={`group w-[248px] shrink-0 rounded-xl border bg-card p-3 text-left transition-all hover:-translate-y-0.5 hover:shadow-lg ${
+      className={`group w-full rounded-xl border bg-card p-3 text-left transition-all hover:-translate-y-0.5 hover:shadow-lg ${
         ready
           ? "hover:border-primary/50"
-          : "border-dashed border-amber-500/50 bg-amber-500/[0.04] hover:border-amber-500"
+          : pending
+            ? "border-sky-500/50 bg-sky-500/[0.05] hover:border-sky-500"
+            : "border-dashed border-amber-500/50 bg-amber-500/[0.04] hover:border-amber-500"
       }`}
     >
       {ready && slot.html ? (
         <TemplateThumb html={slot.html} title={slot.name} />
       ) : (
-        <div className="flex h-24 w-full flex-col items-center justify-center gap-1 rounded-md border border-dashed border-amber-500/40 bg-background/60">
-          <FilePlus2 className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-          <span className="text-[11px] font-medium text-amber-700 dark:text-amber-400">
-            Create template
+        <div
+          className={`flex h-24 w-full flex-col items-center justify-center gap-1 rounded-md border border-dashed bg-background/60 ${
+            pending ? "border-sky-500/40" : "border-amber-500/40"
+          }`}
+        >
+          {pending ? (
+            <Clock className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+          ) : (
+            <FilePlus2 className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+          )}
+          <span
+            className={`text-[11px] font-medium ${
+              pending
+                ? "text-sky-700 dark:text-sky-400"
+                : "text-amber-700 dark:text-amber-400"
+            }`}
+          >
+            {pending ? "In review" : "Create template"}
           </span>
         </div>
       )}
@@ -161,15 +175,19 @@ function NodeCard({
           className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${
             ready
               ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-              : "bg-amber-500/10 text-amber-700 dark:text-amber-400"
+              : pending
+                ? "bg-sky-500/10 text-sky-700 dark:text-sky-400"
+                : "bg-amber-500/10 text-amber-700 dark:text-amber-400"
           }`}
         >
           {ready ? (
             <CheckCircle2 className="h-3 w-3" />
+          ) : pending ? (
+            <Clock className="h-3 w-3" />
           ) : (
             <AlertTriangle className="h-3 w-3" />
           )}
-          {ready ? "Template ready" : "Template missing"}
+          {ready ? "Template ready" : pending ? "In review" : "Template missing"}
         </span>
         <span className="truncate font-mono text-[10px] text-muted-foreground">
           {slot.event}
@@ -217,94 +235,84 @@ function CoverageDashboard() {
   );
 
 
+  const setStatus = (v: "all" | "ready" | "pending" | "missing") =>
+    navigate({ search: (s) => ({ ...s, status: v }) });
+
   return (
     <div className="min-h-[calc(100vh-3.5rem)] bg-muted/20">
       {/* Header */}
       <header className="border-b bg-background/80 backdrop-blur">
-        <div className="mx-auto max-w-[1500px] px-6 py-7">
-          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 lg:flex lg:flex-wrap lg:justify-between">
-            <div className="min-w-0">
-              <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border bg-card px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
-                <Sparkles className="h-3 w-3 text-primary" />
-                Email operations
-              </div>
-              <h1 className="truncate text-2xl font-semibold tracking-tight sm:text-3xl">
-                Email Template Coverage
-              </h1>
-              <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-                Manage and track email templates across your products and customer
-                journeys.
-              </p>
-            </div>
-            <div className="flex shrink-0 flex-col items-stretch gap-2 sm:items-end">
-              <Select
-                value={product.trigger}
-                onValueChange={(v) =>
-                  navigate({ search: (s) => ({ ...s, trigger: v }) })
-                }
-              >
-                <SelectTrigger className="w-full sm:w-[300px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {PRODUCT_TEMPLATE_CATALOG.map((p) => {
-                    const s = productStats(p);
-                    return (
+        <div className="mx-auto max-w-[1500px] px-6 py-6">
+          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border bg-card px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+            <Sparkles className="h-3 w-3 text-primary" />
+            Email operations
+          </div>
+
+          <div className="rounded-2xl border bg-card/60 p-2">
+            <div className="grid gap-2 md:grid-cols-[minmax(240px,340px)_repeat(4,minmax(0,1fr))]">
+              <div className="flex min-w-0 flex-col justify-center rounded-xl border bg-background px-3 py-2">
+                <span className="mb-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                  Product
+                </span>
+                <Select
+                  value={product.trigger}
+                  onValueChange={(v) =>
+                    navigate({ search: (s) => ({ ...s, trigger: v }) })
+                  }
+                >
+                  <SelectTrigger className="h-8 w-full border-0 bg-transparent px-0 text-sm font-semibold shadow-none focus:ring-0">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PRODUCT_TEMPLATE_CATALOG.map((p) => (
                       <SelectItem key={p.trigger} value={p.trigger}>
-                        {p.product} · {s.ready}/{s.total}
+                        {p.product}
                       </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
-              <div className="flex items-center gap-2 self-end">
-                <Button asChild variant="ghost" size="sm">
-                  <Link to="/email-templates/v1">
-                    <History className="mr-1 h-4 w-4" /> Version 1 browser
-                  </Link>
-                </Button>
-                <Button size="sm" onClick={() => openNewTemplate()}>
-                  <Plus className="mr-1 h-4 w-4" /> New template
-                </Button>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
+
+              <StatCard
+                label="All emails"
+                value={String(stats.total)}
+                icon={LayoutTemplate}
+                active={status === "all"}
+                onClick={() => setStatus("all")}
+              />
+              <StatCard
+                label="Ready"
+                value={String(stats.ready)}
+                tone="ready"
+                icon={CheckCircle2}
+                active={status === "ready"}
+                onClick={() => setStatus(status === "ready" ? "all" : "ready")}
+              />
+              <StatCard
+                label="In review"
+                value={String(stats.pending)}
+                tone="pending"
+                icon={Clock}
+                active={status === "pending"}
+                onClick={() =>
+                  setStatus(status === "pending" ? "all" : "pending")
+                }
+              />
+              <StatCard
+                label="Missing"
+                value={String(stats.missing)}
+                tone="missing"
+                icon={AlertTriangle}
+                active={status === "missing"}
+                onClick={() =>
+                  setStatus(status === "missing" ? "all" : "missing")
+                }
+              />
             </div>
           </div>
 
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <span className="font-mono text-[11px] text-muted-foreground">
-              {product.trigger}
-            </span>
-            <div className="flex min-w-[220px] flex-1 items-center gap-3">
-              <Progress value={stats.coverage} className="h-2 flex-1" />
-              <span className="whitespace-nowrap text-sm font-medium tabular-nums">
-                {stats.ready} / {stats.total} templates ready
-              </span>
-            </div>
-          </div>
-
-          <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StatCard
-              label="Email events"
-              value={String(stats.total)}
-              icon={LayoutTemplate}
-            />
-            <StatCard
-              label="Ready"
-              value={String(stats.ready)}
-              tone="ready"
-              icon={CheckCircle2}
-            />
-            <StatCard
-              label="Missing"
-              value={String(stats.missing)}
-              tone="missing"
-              icon={AlertTriangle}
-            />
-            <StatCard
-              label="Coverage"
-              value={`${stats.coverage}%`}
-              icon={Sparkles}
-            />
+          <div className="mt-3 font-mono text-[11px] text-muted-foreground">
+            {product.trigger}
           </div>
         </div>
       </header>
@@ -315,19 +323,8 @@ function CoverageDashboard() {
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             Customer journey
           </h2>
-          <Tabs
-            value={status}
-            onValueChange={(v) =>
-              navigate({ search: (s) => ({ ...s, status: v as "all" }) })
-            }
-          >
-            <TabsList>
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="ready">Ready</TabsTrigger>
-              <TabsTrigger value="missing">Missing</TabsTrigger>
-            </TabsList>
-          </Tabs>
         </div>
+
 
         <div className="pb-6">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">

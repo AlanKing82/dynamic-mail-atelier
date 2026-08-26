@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { CheckCircle2, FilePlus2, Pencil, AlertTriangle } from "lucide-react";
+import { CheckCircle2, Clock, FilePlus2, Pencil, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -31,6 +31,7 @@ function Meta({ label, value, mono }: { label: string; value: string; mono?: boo
 
 export function TemplatePanel({ slot, product, onOpenChange }: Props) {
   const ready = slot?.status === "ready";
+  const pending = slot?.status === "pending";
   const loc = slot ? schemaLocationForEvent(slot.event) : null;
   return (
     <Sheet open={!!slot} onOpenChange={onOpenChange}>
@@ -42,13 +43,18 @@ export function TemplatePanel({ slot, product, onOpenChange }: Props) {
           <>
             <SheetHeader className="border-b p-6">
               <div className="mb-2 flex flex-wrap items-center gap-2">
-                <Badge variant={ready ? "secondary" : "destructive"} className="gap-1">
+                <Badge
+                  variant={ready || pending ? "secondary" : "destructive"}
+                  className="gap-1"
+                >
                   {ready ? (
                     <CheckCircle2 className="h-3 w-3" />
+                  ) : pending ? (
+                    <Clock className="h-3 w-3" />
                   ) : (
                     <AlertTriangle className="h-3 w-3" />
                   )}
-                  {ready ? "Template ready" : "Template missing"}
+                  {ready ? "Template ready" : pending ? "In review" : "Template missing"}
                 </Badge>
                 <Badge variant="outline">{product.product}</Badge>
               </div>

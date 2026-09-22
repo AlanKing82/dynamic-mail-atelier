@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { MediaLibraryDialog } from "@/components/media/MediaLibraryDialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { renderBuilderDocToHtml, emptyDoc, newBlock } from "@/lib/email-templates/render";
@@ -502,6 +503,55 @@ function BlockPreview({ block }: { block: Block }) {
         </div>
       );
   }
+}
+
+function ImageSourceField({
+  src,
+  onChange,
+}: {
+  src: string;
+  onChange: (src: string, alt?: string) => void;
+}) {
+  const [libraryOpen, setLibraryOpen] = useState(false);
+  return (
+    <div className="space-y-2">
+      <Label className="text-xs">Image</Label>
+      <div className="overflow-hidden rounded-lg border bg-muted/40">
+        {src ? (
+          <img src={src} alt="" className="mx-auto max-h-28 object-contain p-2" />
+        ) : (
+          <div className="flex h-24 items-center justify-center text-xs text-muted-foreground">
+            No image selected
+          </div>
+        )}
+      </div>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className="w-full"
+        onClick={() => setLibraryOpen(true)}
+      >
+        <ImageIcon className="mr-1 h-4 w-4" />
+        {src ? "Change image" : "Choose from library"}
+      </Button>
+      <details>
+        <summary className="cursor-pointer text-[11px] text-muted-foreground">
+          Or paste a URL
+        </summary>
+        <Input
+          className="mt-1.5"
+          value={src}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      </details>
+      <MediaLibraryDialog
+        open={libraryOpen}
+        onOpenChange={setLibraryOpen}
+        onSelect={(img) => onChange(img.url, img.name)}
+      />
+    </div>
+  );
 }
 
 function PropertiesPanel({

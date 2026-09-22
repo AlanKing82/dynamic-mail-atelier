@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   Clock,
   FilePlus2,
+  ImagePlus,
   LayoutTemplate,
   Plus,
   Sparkles,
@@ -20,6 +21,7 @@ import {
 } from "@/components/ui/select";
 
 import { TemplateThumb } from "@/components/coverage/TemplateThumb";
+import { MediaLibraryDialog } from "@/components/media/MediaLibraryDialog";
 import { TemplatePanel } from "@/components/coverage/TemplatePanel";
 import {
   NewTemplateDialog,
@@ -202,6 +204,7 @@ function CoverageDashboard() {
   const navigate = useNavigate({ from: "/email-templates" });
   const [selected, setSelected] = useState<TemplateSlot | null>(null);
   const [newOpen, setNewOpen] = useState(false);
+  const [libraryOpen, setLibraryOpen] = useState(false);
   const [newPreset, setNewPreset] = useState<NewTemplatePreset | undefined>(
     undefined,
   );
@@ -243,9 +246,18 @@ function CoverageDashboard() {
       {/* Header */}
       <header className="border-b bg-background/80 backdrop-blur">
         <div className="mx-auto max-w-[1500px] px-6 py-6">
-          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border bg-card px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
-            <Sparkles className="h-3 w-3 text-primary" />
-            Email operations
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div className="inline-flex items-center gap-1.5 rounded-full border bg-card px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+              <Sparkles className="h-3 w-3 text-primary" />
+              Email operations
+            </div>
+            <button
+              type="button"
+              onClick={() => setLibraryOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-lg border bg-card px-3 py-1.5 text-xs font-medium transition-colors hover:border-primary/60 hover:bg-primary/[0.04] hover:text-primary"
+            >
+              <ImagePlus className="h-3.5 w-3.5" /> Image library
+            </button>
           </div>
 
           <div className="rounded-2xl border bg-card/60 p-2">
@@ -397,6 +409,7 @@ function CoverageDashboard() {
         onOpenChange={setNewOpen}
         preset={newPreset}
       />
+      <MediaLibraryDialog open={libraryOpen} onOpenChange={setLibraryOpen} />
     </div>
   );
 }

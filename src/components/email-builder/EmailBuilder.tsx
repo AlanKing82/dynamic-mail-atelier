@@ -581,13 +581,6 @@ function PropertiesPanel({
             src={block.src}
             onChange={(src, alt) => onChange(alt ? { src, alt } : { src })}
           />
-        </div>
-      ) && (
-        <div className="space-y-3">
-          <ImageSourceField
-            src={block.src}
-            onChange={(src, alt) => onChange(alt ? { src, alt } : { src })}
-          />
           <div>
             <Label className="text-xs">Alt text</Label>
             <Input value={block.alt} onChange={(e) => onChange({ alt: e.target.value })} />

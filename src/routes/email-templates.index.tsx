@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   Clock,
   FilePlus2,
+  ImagePlus,
   LayoutTemplate,
   Plus,
   Sparkles,
@@ -20,6 +21,7 @@ import {
 } from "@/components/ui/select";
 
 import { TemplateThumb } from "@/components/coverage/TemplateThumb";
+import { MediaLibraryDialog } from "@/components/media/MediaLibraryDialog";
 import { TemplatePanel } from "@/components/coverage/TemplatePanel";
 import {
   NewTemplateDialog,
@@ -202,6 +204,7 @@ function CoverageDashboard() {
   const navigate = useNavigate({ from: "/email-templates" });
   const [selected, setSelected] = useState<TemplateSlot | null>(null);
   const [newOpen, setNewOpen] = useState(false);
+  const [libraryOpen, setLibraryOpen] = useState(false);
   const [newPreset, setNewPreset] = useState<NewTemplatePreset | undefined>(
     undefined,
   );
@@ -406,6 +409,7 @@ function CoverageDashboard() {
         onOpenChange={setNewOpen}
         preset={newPreset}
       />
+      <MediaLibraryDialog open={libraryOpen} onOpenChange={setLibraryOpen} />
     </div>
   );
 }

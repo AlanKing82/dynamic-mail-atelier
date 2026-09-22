@@ -577,10 +577,17 @@ function PropertiesPanel({
     case "image":
       return (
         <div className="space-y-3">
-          <div>
-            <Label className="text-xs">Image URL</Label>
-            <Input value={block.src} onChange={(e) => onChange({ src: e.target.value })} />
-          </div>
+          <ImageSourceField
+            src={block.src}
+            onChange={(src, alt) => onChange(alt ? { src, alt } : { src })}
+          />
+        </div>
+      ) && (
+        <div className="space-y-3">
+          <ImageSourceField
+            src={block.src}
+            onChange={(src, alt) => onChange(alt ? { src, alt } : { src })}
+          />
           <div>
             <Label className="text-xs">Alt text</Label>
             <Input value={block.alt} onChange={(e) => onChange({ alt: e.target.value })} />

@@ -10,6 +10,7 @@ const searchSchema = z.object({
   fileName: z.string().optional(),
   format: z.string().optional(),
   name: z.string().optional(),
+  subject: z.string().optional(),
 });
 
 export const Route = createFileRoute("/email-builder")({

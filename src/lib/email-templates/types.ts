@@ -71,6 +71,7 @@ export interface BuilderDoc {
 export interface EmailTemplate {
   id: string;
   name: string;
+  subject?: string;
   product: string;
   trigger: string;
   event: string;

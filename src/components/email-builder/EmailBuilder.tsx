@@ -51,6 +51,7 @@ interface BuilderPreset {
   fileName?: string;
   format?: string;
   name?: string;
+  subject?: string;
 }
 
 interface Props {
@@ -90,6 +91,7 @@ export function EmailBuilder({ initial, preset }: Props) {
   const [name, setName] = useState(
     initial?.name ?? preset?.name ?? "Untitled template",
   );
+  const [subject, setSubject] = useState(initial?.subject ?? preset?.subject ?? "");
   const [product, setProduct] = useState(
     initial?.product ?? preset?.product ?? PRODUCTS[0] ?? "",
   );
@@ -153,6 +155,7 @@ export function EmailBuilder({ initial, preset }: Props) {
     const template: EmailTemplate = {
       id,
       name: name.trim() || "Untitled template",
+      subject: subject.trim(),
       product,
       trigger,
       event: eventName,
@@ -187,47 +190,70 @@ export function EmailBuilder({ initial, preset }: Props) {
   return (
     <div className="flex flex-col h-[calc(100vh-3.5rem)]">
       {/* Toolbar */}
-      <div className="border-b bg-background p-3 flex flex-wrap items-center gap-3">
-        <Input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="max-w-xs"
-          placeholder="Template name"
-          disabled={readOnly}
-        />
-        <Select value={product} onValueChange={setProduct} disabled={readOnly}>
-          <SelectTrigger className="w-48"><SelectValue placeholder="Product" /></SelectTrigger>
-          <SelectContent>
-            {PRODUCTS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-          </SelectContent>
-        </Select>
-        <Select value={trigger} onValueChange={setTrigger} disabled={readOnly}>
-          <SelectTrigger className="w-72"><SelectValue placeholder="Trigger" /></SelectTrigger>
-          <SelectContent>
-            {TRIGGERS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-          </SelectContent>
-        </Select>
-        <Input
-          value={eventName}
-          onChange={(e) => setEventName(e.target.value)}
-          className="max-w-[160px]"
-          placeholder="event"
-          disabled={readOnly}
-        />
-        <div className="ml-auto flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => setShowSource((s) => !s)}>
-            {showSource ? <Eye className="h-4 w-4 mr-1" /> : <Code2 className="h-4 w-4 mr-1" />}
-            {showSource ? "Preview" : "Source"}
-          </Button>
-          {readOnly ? (
-            <Button size="sm" onClick={handleDuplicateFromReadOnly}>
-              Duplicate as new
+      <div className="border-b bg-background p-3 space-y-3">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
+          <div className="grid min-w-0 gap-1.5 lg:w-64 lg:shrink-0">
+            <Label htmlFor="template-name" className="text-xs text-muted-foreground">
+              Template name
+            </Label>
+            <Input
+              id="template-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Template name"
+              disabled={readOnly}
+            />
+          </div>
+          <div className="grid min-w-0 flex-1 gap-1.5">
+            <Label htmlFor="template-subject" className="text-xs font-medium">
+              Subject
+            </Label>
+            <Input
+              id="template-subject"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="Benvenuto in Zurich Meteo Protetto"
+              disabled={readOnly}
+              className="font-medium"
+            />
+          </div>
+          <div className="flex shrink-0 gap-2 self-end">
+            <Button variant="outline" size="sm" onClick={() => setShowSource((s) => !s)}>
+              {showSource ? <Eye className="mr-1 h-4 w-4" /> : <Code2 className="mr-1 h-4 w-4" />}
+              {showSource ? "Preview" : "Source"}
             </Button>
-          ) : (
-            <Button size="sm" onClick={handleSave}>
-              <Save className="h-4 w-4 mr-1" /> Save
-            </Button>
-          )}
+            {readOnly ? (
+              <Button size="sm" onClick={handleDuplicateFromReadOnly}>
+                Duplicate as new
+              </Button>
+            ) : (
+              <Button size="sm" onClick={handleSave}>
+                <Save className="mr-1 h-4 w-4" /> Save
+              </Button>
+            )}
+          </div>
+        </div>
+
+        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-[12rem_minmax(16rem,1fr)_10rem]">
+          <Select value={product} onValueChange={setProduct} disabled={readOnly}>
+            <SelectTrigger className="w-full"><SelectValue placeholder="Product" /></SelectTrigger>
+            <SelectContent>
+              {PRODUCTS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Select value={trigger} onValueChange={setTrigger} disabled={readOnly}>
+            <SelectTrigger className="w-full"><SelectValue placeholder="Trigger" /></SelectTrigger>
+            <SelectContent>
+              {TRIGGERS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Input
+            value={eventName}
+            onChange={(e) => setEventName(e.target.value)}
+            placeholder="Event"
+            disabled={readOnly}
+            className="sm:col-span-2 xl:col-span-1"
+          />
         </div>
       </div>
 

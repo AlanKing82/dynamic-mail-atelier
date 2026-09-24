@@ -190,34 +190,15 @@ export function EmailBuilder({ initial, preset }: Props) {
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] flex-col lg:h-[calc(100vh-3.5rem)] lg:min-h-0">
       {/* Toolbar */}
-      <div className="border-b bg-background p-3 space-y-3">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
-          <div className="grid min-w-0 gap-1.5 lg:w-64 lg:shrink-0">
-            <Label htmlFor="template-name" className="text-xs text-muted-foreground">
-              Template name
-            </Label>
-            <Input
-              id="template-name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Template name"
-              disabled={readOnly}
-            />
+      <div className="space-y-4 border-b bg-background px-3 py-3 sm:px-5">
+        <div className="flex items-center justify-between gap-3 border-b pb-3">
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold">Email template</p>
+            <p className="text-xs text-muted-foreground">
+              {readOnly ? "Read-only template" : "Draft changes"}
+            </p>
           </div>
-          <div className="grid min-w-0 flex-1 gap-1.5">
-            <Label htmlFor="template-subject" className="text-xs font-medium">
-              Subject
-            </Label>
-            <Input
-              id="template-subject"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              placeholder="Benvenuto in Zurich Meteo Protetto"
-              disabled={readOnly}
-              className="font-medium"
-            />
-          </div>
-          <div className="flex shrink-0 gap-2 self-end">
+          <div className="flex shrink-0 items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => setShowSource((s) => !s)}>
               {showSource ? <Eye className="mr-1 h-4 w-4" /> : <Code2 className="mr-1 h-4 w-4" />}
               {showSource ? "Preview" : "Source"}
@@ -234,26 +215,57 @@ export function EmailBuilder({ initial, preset }: Props) {
           </div>
         </div>
 
-        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-[12rem_minmax(16rem,1fr)_10rem]">
-          <Select value={product} onValueChange={setProduct} disabled={readOnly}>
-            <SelectTrigger className="w-full"><SelectValue placeholder="Product" /></SelectTrigger>
-            <SelectContent>
-              {PRODUCTS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Select value={trigger} onValueChange={setTrigger} disabled={readOnly}>
-            <SelectTrigger className="w-full"><SelectValue placeholder="Trigger" /></SelectTrigger>
-            <SelectContent>
-              {TRIGGERS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Input
-            value={eventName}
-            onChange={(e) => setEventName(e.target.value)}
-            placeholder="Event"
-            disabled={readOnly}
-            className="sm:col-span-2 xl:col-span-1"
-          />
+        <div className="space-y-3">
+          <div className="grid gap-3 lg:grid-cols-[minmax(12rem,0.8fr)_minmax(18rem,1.7fr)]">
+            <div className="grid min-w-0 gap-1.5">
+              <Label htmlFor="template-name" className="text-xs text-muted-foreground">
+                Template name
+              </Label>
+              <Input
+                id="template-name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Template name"
+                disabled={readOnly}
+                className="bg-card"
+              />
+            </div>
+            <div className="grid min-w-0 gap-1.5">
+              <Label htmlFor="template-subject" className="text-xs text-muted-foreground">
+                Subject
+              </Label>
+              <Input
+                id="template-subject"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                placeholder="Benvenuto in Zurich Meteo Protetto"
+                disabled={readOnly}
+                className="bg-card font-medium"
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-[12rem_minmax(16rem,1fr)_10rem]">
+            <Select value={product} onValueChange={setProduct} disabled={readOnly}>
+              <SelectTrigger className="w-full bg-card"><SelectValue placeholder="Product" /></SelectTrigger>
+              <SelectContent>
+                {PRODUCTS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Select value={trigger} onValueChange={setTrigger} disabled={readOnly}>
+              <SelectTrigger className="w-full bg-card"><SelectValue placeholder="Trigger" /></SelectTrigger>
+              <SelectContent>
+                {TRIGGERS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Input
+              value={eventName}
+              onChange={(e) => setEventName(e.target.value)}
+              placeholder="Event"
+              disabled={readOnly}
+              className="bg-card sm:col-span-2 xl:col-span-1"
+            />
+          </div>
         </div>
       </div>
 

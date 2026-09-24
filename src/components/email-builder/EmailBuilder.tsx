@@ -188,7 +188,7 @@ export function EmailBuilder({ initial, preset }: Props) {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-3.5rem)]">
+    <div className="flex min-h-[calc(100vh-3.5rem)] flex-col lg:h-[calc(100vh-3.5rem)] lg:min-h-0">
       {/* Toolbar */}
       <div className="border-b bg-background p-3 space-y-3">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
@@ -280,9 +280,9 @@ export function EmailBuilder({ initial, preset }: Props) {
         </Alert>
       )}
 
-      <div className="flex flex-1 min-h-0">
+      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         {/* Canvas */}
-        <div className="flex-1 overflow-auto bg-muted/40 p-6">
+        <div className="order-2 min-h-[36rem] flex-1 overflow-auto bg-muted/40 p-3 sm:p-6 lg:order-1">
           {readOnly || showSource ? (
             showSource ? (
               <pre className="max-w-[900px] mx-auto p-4 text-xs whitespace-pre-wrap font-mono bg-background rounded border">
@@ -312,14 +312,14 @@ export function EmailBuilder({ initial, preset }: Props) {
 
         {/* Right sidebar */}
         {!readOnly && (
-          <aside className="w-[320px] border-l bg-background flex flex-col">
+          <aside className="order-1 flex w-full flex-col border-b bg-background lg:order-2 lg:w-[320px] lg:border-b-0 lg:border-l">
             <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)} className="flex-1 flex flex-col">
               <TabsList className="grid grid-cols-3 m-3">
                 <TabsTrigger value="components">Components</TabsTrigger>
                 <TabsTrigger value="properties">Properties</TabsTrigger>
                 <TabsTrigger value="variables">Variables</TabsTrigger>
               </TabsList>
-              <ScrollArea className="flex-1">
+              <ScrollArea className="max-h-80 flex-1 lg:max-h-none">
                 <TabsContent value="components" className="p-3 space-y-2 m-0">
                   <p className="text-xs text-muted-foreground mb-2">
                     Drag a component into the canvas, or click to append.

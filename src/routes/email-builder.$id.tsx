@@ -9,6 +9,8 @@ export const Route = createFileRoute("/email-builder/$id")({
       { name: "description", content: "Edit an existing email template" },
       { property: "og:title", content: "Edit Template — Exante Admin" },
       { property: "og:description", content: "Edit an existing email template" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   loader: async ({ params }) => {

@@ -33,6 +33,8 @@ export const Route = createFileRoute("/email-templates/v1")({
       { name: "description", content: "Version 1 email template browser with filters and preview" },
       { property: "og:title", content: "Templates (v1) — Exante Admin" },
       { property: "og:description", content: "Version 1 email template browser with filters and preview" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(templatesQueryOptions()),

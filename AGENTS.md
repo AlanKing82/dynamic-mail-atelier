@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep image tagging in one editor above the upload area, shared by selected-image edits and the next upload, so tags can be chosen before dropping files without a second conflicting input.

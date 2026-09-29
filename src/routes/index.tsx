@@ -9,6 +9,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Admin dashboard shortcuts" },
       { property: "og:title", content: "Home — Exante Admin" },
       { property: "og:description", content: "Admin dashboard shortcuts" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Index,

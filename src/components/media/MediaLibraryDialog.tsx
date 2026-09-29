@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Check,
   ImagePlus,
+  Plus,
   Search,
   Tag as TagIcon,
   Trash2,
@@ -39,14 +40,16 @@ interface Props {
   onSelect?: (image: MediaImage) => void;
 }
 
+const QUICK_TAGS = ["logo", "banner", "product", "footer"];
+
 export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
   const [images, setImages] = useState<MediaImage[]>([]);
   const [query, setQuery] = useState("");
   const [activeTag, setActiveTag] = useState<string | null>(null);
-  const [uploadTags, setUploadTags] = useState("");
+  const [draftTags, setDraftTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState("");
   const [dragging, setDragging] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [tagDraft, setTagDraft] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const refresh = useCallback(() => setImages(listImages()), []);
@@ -75,17 +78,33 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
     [filtered, selectedId],
   );
 
-  useEffect(() => {
-    setTagDraft(selected ? selected.tags.join(", ") : "");
-  }, [selectedId]); // eslint-disable-line react-hooks/exhaustive-deps
+  const setTags = (next: string[]) => {
+    setDraftTags(next);
+    if (selectedId) updateImage(selectedId, { tags: next });
+  };
+
+  const addTag = () => {
+    const additions = normalizeTags(newTag);
+    if (additions.length) setTags(Array.from(new Set([...draftTags, ...additions])));
+    setNewTag("");
+  };
+
+  const selectImage = (image: MediaImage) => {
+    setSelectedId(image.id);
+    setDraftTags(image.tags);
+    setNewTag("");
+  };
 
   const handleFiles = async (files: FileList | File[] | null) => {
     if (!files) return;
     const list = Array.from(files);
-    const created = await uploadImages(list, normalizeTags(uploadTags));
+    if (!list.length) return;
+    const created = await uploadImages(list, draftTags);
     refresh();
     if (created.length) {
       setSelectedId(created[0].id);
+      setQuery("");
+      setActiveTag(null);
       toast.success(
         `${created.length} image${created.length > 1 ? "s" : ""} added to the library`,
       );

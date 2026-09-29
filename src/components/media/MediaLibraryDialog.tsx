@@ -223,18 +223,18 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
               </div>
               {tags.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
-                  <button onClick={() => setActiveTag(null)}>
+                   <Button type="button" variant="ghost" size="sm" className="h-7 p-0" onClick={() => setActiveTag(null)}>
                     <Badge variant={activeTag ? "outline" : "default"}>All</Badge>
-                  </button>
+                   </Button>
                   {tags.map((t) => (
-                    <button
+                     <Button type="button" variant="ghost" size="sm" className="h-7 p-0"
                       key={t}
                       onClick={() => setActiveTag(activeTag === t ? null : t)}
                     >
                       <Badge variant={activeTag === t ? "default" : "outline"}>
                         {t}
                       </Badge>
-                    </button>
+                     </Button>
                   ))}
                 </div>
               )}
@@ -252,10 +252,10 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
                 ) : (
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                     {filtered.map((img) => (
-                      <button
+                       <Button type="button" variant="ghost"
                         key={img.id}
-                        onClick={() => setSelectedId(img.id)}
-                        className={`group relative overflow-hidden rounded-xl border bg-card text-left transition-all hover:-translate-y-0.5 hover:shadow-md ${
+                         onClick={() => selectImage(img)}
+                         className={`group relative h-auto w-full flex-col items-stretch gap-0 whitespace-normal overflow-hidden rounded-md border bg-card p-0 text-left transition-all hover:-translate-y-0.5 hover:shadow-md ${
                           selectedId === img.id
                             ? "border-primary ring-2 ring-primary/40"
                             : ""
@@ -288,7 +288,7 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
                             ))}
                           </div>
                         </div>
-                      </button>
+                       </Button>
                     ))}
                   </div>
                 )}
@@ -312,35 +312,11 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
                     <div className="truncate text-sm font-semibold">
                       {selected.name}
                     </div>
-                    <div className="text-xs text-muted-foreground">
+                     <div className="text-xs text-muted-foreground">
                       {selected.width && selected.height
                         ? `${selected.width} × ${selected.height} · `
                         : ""}
-                      {formatBytes(selected.size)}
-                    </div>
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                      Tags
-                    </label>
-                    <Input
-                      value={tagDraft}
-                      onChange={(e) => setTagDraft(e.target.value)}
-                      onBlur={() => {
-                        updateImage(selected.id, {
-                          tags: normalizeTags(tagDraft),
-                        });
-                        refresh();
-                      }}
-                      placeholder="logo, hero, footer"
-                      className="h-8 text-xs"
-                    />
-                    <div className="flex flex-wrap gap-1 pt-1">
-                      {selected.tags.map((t) => (
-                        <Badge key={t} variant="secondary">
-                          {t}
-                        </Badge>
-                      ))}
+                       {typeof selected.size === "number" ? formatBytes(selected.size) : ""}
                     </div>
                   </div>
                 </div>
@@ -351,6 +327,7 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
                     onClick={() => {
                       deleteImage(selected.id);
                       setSelectedId(null);
+                       setDraftTags([]);
                       refresh();
                       toast.success("Image removed");
                     }}

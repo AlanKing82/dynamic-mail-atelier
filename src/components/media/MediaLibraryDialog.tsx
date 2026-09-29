@@ -74,8 +74,8 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
   }, [images, query, activeTag]);
 
   const selected = useMemo(
-    () => filtered.find((i) => i.id === selectedId) ?? null,
-    [filtered, selectedId],
+    () => images.find((i) => i.id === selectedId) ?? null,
+    [images, selectedId],
   );
 
   const setTags = (next: string[]) => {

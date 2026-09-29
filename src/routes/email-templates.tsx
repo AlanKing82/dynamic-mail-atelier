@@ -7,6 +7,8 @@ export const Route = createFileRoute("/email-templates")({
       { name: "description", content: "Browse, search and preview existing email templates" },
       { property: "og:title", content: "Email Templates — Exante Admin" },
       { property: "og:description", content: "Browse, search and preview existing email templates" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: () => <Outlet />,

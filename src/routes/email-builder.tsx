@@ -21,6 +21,8 @@ export const Route = createFileRoute("/email-builder")({
       { name: "description", content: "Visual drag-and-drop email template builder" },
       { property: "og:title", content: "Email Builder — Exante Admin" },
       { property: "og:description", content: "Visual drag-and-drop email template builder" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: NewBuilderRoute,

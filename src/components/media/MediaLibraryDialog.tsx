@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Check,
   ImagePlus,
+  Plus,
   Search,
   Tag as TagIcon,
   Trash2,
@@ -39,14 +40,16 @@ interface Props {
   onSelect?: (image: MediaImage) => void;
 }
 
+const QUICK_TAGS = ["logo", "banner", "product", "footer"];
+
 export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
   const [images, setImages] = useState<MediaImage[]>([]);
   const [query, setQuery] = useState("");
   const [activeTag, setActiveTag] = useState<string | null>(null);
-  const [uploadTags, setUploadTags] = useState("");
+  const [draftTags, setDraftTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState("");
   const [dragging, setDragging] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [tagDraft, setTagDraft] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const refresh = useCallback(() => setImages(listImages()), []);
@@ -71,21 +74,37 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
   }, [images, query, activeTag]);
 
   const selected = useMemo(
-    () => filtered.find((i) => i.id === selectedId) ?? null,
-    [filtered, selectedId],
+    () => images.find((i) => i.id === selectedId) ?? null,
+    [images, selectedId],
   );
 
-  useEffect(() => {
-    setTagDraft(selected ? selected.tags.join(", ") : "");
-  }, [selectedId]); // eslint-disable-line react-hooks/exhaustive-deps
+  const setTags = (next: string[]) => {
+    setDraftTags(next);
+    if (selectedId) updateImage(selectedId, { tags: next });
+  };
+
+  const addTag = () => {
+    const additions = normalizeTags(newTag);
+    if (additions.length) setTags(Array.from(new Set([...draftTags, ...additions])));
+    setNewTag("");
+  };
+
+  const selectImage = (image: MediaImage) => {
+    setSelectedId(image.id);
+    setDraftTags(image.tags);
+    setNewTag("");
+  };
 
   const handleFiles = async (files: FileList | File[] | null) => {
     if (!files) return;
     const list = Array.from(files);
-    const created = await uploadImages(list, normalizeTags(uploadTags));
+    if (!list.length) return;
+    const created = await uploadImages(list, draftTags);
     refresh();
     if (created.length) {
       setSelectedId(created[0].id);
+      setQuery("");
+      setActiveTag(null);
       toast.success(
         `${created.length} image${created.length > 1 ? "s" : ""} added to the library`,
       );
@@ -109,8 +128,46 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
 
         <div className="grid md:grid-cols-[1fr_290px]">
           <div className="min-w-0 border-r">
-            {/* Upload zone */}
+            {/* Tags are edited in one place, before or after uploading */}
             <div className="space-y-3 border-b p-5">
+              <div className="space-y-2 rounded-md border bg-muted/30 p-3">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <TagIcon className="h-4 w-4 text-muted-foreground" /> Tags
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {selected ? `Editing ${selected.name}. Tags also apply to your next upload.` : "Choose tags before uploading, or add them afterward."}
+                </p>
+                <div className="flex gap-2">
+                  <Input
+                    aria-label="Add a tag"
+                    value={newTag}
+                    onChange={(e) => setNewTag(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === ",") {
+                        e.preventDefault();
+                        addTag();
+                      }
+                    }}
+                    placeholder="Add a custom tag"
+                    className="h-8 min-w-0 flex-1 text-xs"
+                  />
+                  <Button type="button" size="sm" variant="outline" onClick={addTag} disabled={!newTag.trim()} aria-label="Add tag">
+                    <Plus className="h-4 w-4" /> Add
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {draftTags.map((tag) => (
+                    <Button key={tag} type="button" size="sm" variant="secondary" className="h-7 gap-1 px-2 text-xs" onClick={() => setTags(draftTags.filter((t) => t !== tag))} aria-label={`Remove ${tag} tag`}>
+                      {tag} <X className="h-3 w-3" />
+                    </Button>
+                  ))}
+                  {QUICK_TAGS.filter((tag) => !draftTags.includes(tag)).map((tag) => (
+                    <Button key={tag} type="button" size="sm" variant="outline" className="h-7 gap-1 px-2 text-xs" onClick={() => setTags([...draftTags, tag])} aria-label={`Add ${tag} tag`}>
+                      <Plus className="h-3 w-3" /> {tag}
+                    </Button>
+                  ))}
+                </div>
+              </div>
               <div
                 onDragOver={(e) => {
                   e.preventDefault();
@@ -123,7 +180,7 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
                   handleFiles(e.dataTransfer.files);
                 }}
                 onClick={() => fileRef.current?.click()}
-                className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-6 py-8 text-center transition-colors ${
+                className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed px-6 py-6 text-center transition-colors ${
                   dragging
                     ? "border-primary bg-primary/5"
                     : "hover:border-primary/60 hover:bg-muted/50"
@@ -139,15 +196,6 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
                 <p className="text-xs text-muted-foreground">
                   PNG, JPG, GIF or SVG
                 </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <TagIcon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                <Input
-                  value={uploadTags}
-                  onChange={(e) => setUploadTags(e.target.value)}
-                  placeholder="Tags for new uploads, comma separated (e.g. logo, hero)"
-                  className="h-8 text-xs"
-                />
               </div>
               <input
                 ref={fileRef}
@@ -175,18 +223,18 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
               </div>
               {tags.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
-                  <button onClick={() => setActiveTag(null)}>
+                   <Button type="button" variant="ghost" size="sm" className="h-7 p-0" onClick={() => setActiveTag(null)}>
                     <Badge variant={activeTag ? "outline" : "default"}>All</Badge>
-                  </button>
+                   </Button>
                   {tags.map((t) => (
-                    <button
+                     <Button type="button" variant="ghost" size="sm" className="h-7 p-0"
                       key={t}
                       onClick={() => setActiveTag(activeTag === t ? null : t)}
                     >
                       <Badge variant={activeTag === t ? "default" : "outline"}>
                         {t}
                       </Badge>
-                    </button>
+                     </Button>
                   ))}
                 </div>
               )}
@@ -204,10 +252,10 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
                 ) : (
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                     {filtered.map((img) => (
-                      <button
+                       <Button type="button" variant="ghost"
                         key={img.id}
-                        onClick={() => setSelectedId(img.id)}
-                        className={`group relative overflow-hidden rounded-xl border bg-card text-left transition-all hover:-translate-y-0.5 hover:shadow-md ${
+                         onClick={() => selectImage(img)}
+                         className={`group relative h-auto w-full flex-col items-stretch gap-0 whitespace-normal overflow-hidden rounded-md border bg-card p-0 text-left transition-all hover:-translate-y-0.5 hover:shadow-md ${
                           selectedId === img.id
                             ? "border-primary ring-2 ring-primary/40"
                             : ""
@@ -240,7 +288,7 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
                             ))}
                           </div>
                         </div>
-                      </button>
+                       </Button>
                     ))}
                   </div>
                 )}
@@ -264,35 +312,11 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
                     <div className="truncate text-sm font-semibold">
                       {selected.name}
                     </div>
-                    <div className="text-xs text-muted-foreground">
+                     <div className="text-xs text-muted-foreground">
                       {selected.width && selected.height
                         ? `${selected.width} × ${selected.height} · `
                         : ""}
-                      {formatBytes(selected.size)}
-                    </div>
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                      Tags
-                    </label>
-                    <Input
-                      value={tagDraft}
-                      onChange={(e) => setTagDraft(e.target.value)}
-                      onBlur={() => {
-                        updateImage(selected.id, {
-                          tags: normalizeTags(tagDraft),
-                        });
-                        refresh();
-                      }}
-                      placeholder="logo, hero, footer"
-                      className="h-8 text-xs"
-                    />
-                    <div className="flex flex-wrap gap-1 pt-1">
-                      {selected.tags.map((t) => (
-                        <Badge key={t} variant="secondary">
-                          {t}
-                        </Badge>
-                      ))}
+                       {typeof selected.size === "number" ? formatBytes(selected.size) : ""}
                     </div>
                   </div>
                 </div>
@@ -303,6 +327,7 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
                     onClick={() => {
                       deleteImage(selected.id);
                       setSelectedId(null);
+                       setDraftTags([]);
                       refresh();
                       toast.success("Image removed");
                     }}

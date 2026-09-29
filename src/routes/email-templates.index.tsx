@@ -58,6 +58,8 @@ export const Route = createFileRoute("/email-templates/")({
         content:
           "Track email template coverage across products and customer journeys.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: CoverageDashboard,

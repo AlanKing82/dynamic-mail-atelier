@@ -6,6 +6,7 @@ import {
   Search,
   Tag as TagIcon,
   Trash2,
+  TriangleAlert,
   UploadCloud,
   X,
 } from "lucide-react";
@@ -16,6 +17,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -50,6 +61,7 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
   const [newTag, setNewTag] = useState("");
   const [dragging, setDragging] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const refresh = useCallback(() => setImages(listImages()), []);
@@ -352,13 +364,7 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => {
-                      deleteImage(selected.id);
-                      setSelectedId(null);
-                       setDraftTags([]);
-                      refresh();
-                      toast.success("Image removed");
-                    }}
+                    onClick={() => setConfirmDelete(true)}
                     aria-label="Delete image"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -395,6 +401,40 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
             )}
           </aside>
         </div>
+
+        <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <div className="mx-auto mb-2 grid h-12 w-12 place-items-center rounded-full bg-destructive/10">
+                <TriangleAlert className="h-6 w-6 text-destructive" />
+              </div>
+              <AlertDialogTitle className="text-center">
+                Delete this image?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-center">
+                “{selected?.name}” will be permanently removed from the image
+                library. Email templates using it may lose the image and show a
+                broken placeholder. This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive/40"
+                onClick={() => {
+                  if (!selected) return;
+                  deleteImage(selected.id);
+                  setSelectedId(null);
+                  setDraftTags([]);
+                  refresh();
+                  toast.success("Image removed");
+                }}
+              >
+                <Trash2 className="h-4 w-4" /> Yes, delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </DialogContent>
     </Dialog>
   );

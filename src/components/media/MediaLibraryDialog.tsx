@@ -364,13 +364,7 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => {
-                      deleteImage(selected.id);
-                      setSelectedId(null);
-                       setDraftTags([]);
-                      refresh();
-                      toast.success("Image removed");
-                    }}
+                    onClick={() => setConfirmDelete(true)}
                     aria-label="Delete image"
                   >
                     <Trash2 className="h-4 w-4" />

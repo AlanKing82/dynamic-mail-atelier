@@ -61,6 +61,7 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
   const [newTag, setNewTag] = useState("");
   const [dragging, setDragging] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const refresh = useCallback(() => setImages(listImages()), []);

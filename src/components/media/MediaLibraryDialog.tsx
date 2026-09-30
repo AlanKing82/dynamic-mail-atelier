@@ -401,6 +401,40 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
             )}
           </aside>
         </div>
+
+        <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <div className="mx-auto mb-2 grid h-12 w-12 place-items-center rounded-full bg-destructive/10">
+                <TriangleAlert className="h-6 w-6 text-destructive" />
+              </div>
+              <AlertDialogTitle className="text-center">
+                Delete this image?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-center">
+                “{selected?.name}” will be permanently removed from the image
+                library. Email templates using it may lose the image and show a
+                broken placeholder. This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/40"
+                onClick={() => {
+                  if (!selected) return;
+                  deleteImage(selected.id);
+                  setSelectedId(null);
+                  setDraftTags([]);
+                  refresh();
+                  toast.success("Image removed");
+                }}
+              >
+                <Trash2 className="h-4 w-4" /> Yes, delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </DialogContent>
     </Dialog>
   );

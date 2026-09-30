@@ -420,7 +420,7 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction
-                className="bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/40"
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive/40"
                 onClick={() => {
                   if (!selected) return;
                   deleteImage(selected.id);

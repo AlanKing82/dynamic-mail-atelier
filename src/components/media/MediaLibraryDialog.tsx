@@ -128,46 +128,7 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
 
         <div className="grid md:grid-cols-[1fr_290px]">
           <div className="min-w-0 border-r">
-            {/* Tags are edited in one place, before or after uploading */}
             <div className="space-y-3 border-b p-5">
-              <div className="space-y-2 rounded-md border bg-muted/30 p-3">
-                <div className="flex items-center gap-2 text-sm font-medium">
-                  <TagIcon className="h-4 w-4 text-muted-foreground" /> Tags
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {selected ? `Editing ${selected.name}. Tags also apply to your next upload.` : "Choose tags before uploading, or add them afterward."}
-                </p>
-                <div className="flex gap-2">
-                  <Input
-                    aria-label="Add a tag"
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === ",") {
-                        e.preventDefault();
-                        addTag();
-                      }
-                    }}
-                    placeholder="Add a custom tag"
-                    className="h-8 min-w-0 flex-1 text-xs"
-                  />
-                  <Button type="button" size="sm" variant="outline" onClick={addTag} disabled={!newTag.trim()} aria-label="Add tag">
-                    <Plus className="h-4 w-4" /> Add
-                  </Button>
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {draftTags.map((tag) => (
-                    <Button key={tag} type="button" size="sm" variant="secondary" className="h-7 gap-1 px-2 text-xs" onClick={() => setTags(draftTags.filter((t) => t !== tag))} aria-label={`Remove ${tag} tag`}>
-                      {tag} <X className="h-3 w-3" />
-                    </Button>
-                  ))}
-                  {QUICK_TAGS.filter((tag) => !draftTags.includes(tag)).map((tag) => (
-                    <Button key={tag} type="button" size="sm" variant="outline" className="h-7 gap-1 px-2 text-xs" onClick={() => setTags([...draftTags, tag])} aria-label={`Add ${tag} tag`}>
-                      <Plus className="h-3 w-3" /> {tag}
-                    </Button>
-                  ))}
-                </div>
-              </div>
               <div
                 onDragOver={(e) => {
                   e.preventDefault();
@@ -298,6 +259,73 @@ export function MediaLibraryDialog({ open, onOpenChange, onSelect }: Props) {
 
           {/* Details */}
           <aside className="flex min-h-[420px] flex-col">
+            <div className="space-y-3 border-b p-5">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <TagIcon className="h-4 w-4 text-muted-foreground" /> Tags
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {selected
+                  ? `Editing ${selected.name}.`
+                  : "Choose tags for your next upload."}
+              </p>
+              <div className="flex gap-2">
+                <Input
+                  aria-label="Add a tag"
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === ",") {
+                      e.preventDefault();
+                      addTag();
+                    }
+                  }}
+                  placeholder="Add a custom tag"
+                  className="h-8 min-w-0 flex-1 text-xs"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={addTag}
+                  disabled={!newTag.trim()}
+                  aria-label="Add tag"
+                >
+                  <Plus className="h-4 w-4" /> Add
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {draftTags.map((tag) => (
+                  <Button
+                    key={tag}
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    className="h-7 gap-1 px-2 text-xs"
+                    onClick={() =>
+                      setTags(draftTags.filter((item) => item !== tag))
+                    }
+                    aria-label={`Remove ${tag} tag`}
+                  >
+                    {tag} <X className="h-3 w-3" />
+                  </Button>
+                ))}
+                {QUICK_TAGS.filter((tag) => !draftTags.includes(tag)).map(
+                  (tag) => (
+                    <Button
+                      key={tag}
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="h-7 gap-1 px-2 text-xs"
+                      onClick={() => setTags([...draftTags, tag])}
+                      aria-label={`Add ${tag} tag`}
+                    >
+                      <Plus className="h-3 w-3" /> {tag}
+                    </Button>
+                  ),
+                )}
+              </div>
+            </div>
             {selected ? (
               <>
                 <div className="flex-1 space-y-4 overflow-y-auto p-5">
